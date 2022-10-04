@@ -31,14 +31,39 @@ func (r *PersonalRecordRepository) GetIndex() (*[]models.PersonalRecord, error) 
 func (r *PersonalRecordRepository) UpdateRecord(personalRecord *models.PersonalRecord) (*models.PersonalRecord, error) {
 
 	fmt.Println(personalRecord)
+
 	//grom 에서는 구조체로 저장시 0 값인 필드는 업데이트 하지 않는다., 맵으로 변환하여 저장해야함.
-	err := r.db.Model(&personalRecord).Where("m_id = ?", personalRecord.UserID).Updates(personalRecord).Error
+	//Put 메소드로 Update 에서는 전체 필드를 넘겨 받아서 처리한다. 단, 값이 숫자 필드가 0인 값이 있다면 맵으로 변환해서 처리 해야함.
+	//err := r.db.Model(&personalRecord).Where("m_id = ?", personalRecord.UserID).Updates(personalRecord).Error
+
 	//맵으로 변경해야할 값을 넘기면 0 값도 저장 됨.
-	//err := r.db.Model(&personalRecord).Where("m_id = ?", personalRecord.UserID).Updates(map[string]interface{}{"Gole": 0}).Error
+	//err := r.db.Model(&personalRecord).Where("m_id = ?", personalRecord.UserID).Updates(jsonData).Error
+
 	//select 해서 변경할 필드를 지정 가능. 이렇게하면 0 도 저장 됨.
-	//err := r.db.Model(&personalRecord).Select("*").Where("m_id = ?", personalRecord.UserID).Updates(personalRecord).Error
+	err := r.db.Model(&personalRecord).Select("*").Where("m_id = ?", personalRecord.UserID).Updates(personalRecord).Error
 	if err != nil {
 		return nil, err
+	}
+
+	return personalRecord, nil
+}
+
+func (r *PersonalRecordRepository) PatchRecord(userId string, jsonData map[string]interface{}) (*models.PersonalRecord, error) {
+
+	fmt.Println(jsonData)
+
+	personalRecord := &models.PersonalRecord{}
+
+	//patch update 일때는 맵으로 전달된 필드만 업데이트 한다.
+	err := r.db.Model(&personalRecord).Where("m_id = ?", userId).Updates(jsonData).Error
+	if err != nil {
+		return nil, err
+	}
+
+	err2 := r.db.Where("m_id = ?", userId).Order("m_destday desc").First(personalRecord).Error
+	if err2 != nil {
+		log.Printf("%v", err2)
+		return nil, err2
 	}
 
 	return personalRecord, nil

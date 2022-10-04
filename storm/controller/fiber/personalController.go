@@ -3,6 +3,7 @@ package controller
 //개인기록 요청받아 서비스에서 결과를 받아와 응답주는 처리
 
 import (
+	"fmt"
 	"net/http"
 	"storm/models"
 	"storm/services/personal"
@@ -19,7 +20,7 @@ func NewPersonalRecordController(s *personal.PersonalRecordServices) *PersonalRe
 }
 
 func (c *PersonalRecordController) GetRecordIndex(ctx *fiber.Ctx) error {
-	personalRecords, err := c.svc.GetRecordIndex2()
+	personalRecords, err := c.svc.GetRecordIndex()
 	if err != nil {
 		ctx.Status(http.StatusBadRequest).JSON(
 			&fiber.Map{"message": "could not get data"})
@@ -35,16 +36,16 @@ func (c *PersonalRecordController) GetRecordIndex(ctx *fiber.Ctx) error {
 }
 
 func (c *PersonalRecordController) GetRecordByID(ctx *fiber.Ctx) error {
-	id := ctx.Params("id")
+	userId := ctx.Params("id")
 	//log.Println("param id :" + id)
-	if id == "" {
+	if userId == "" {
 		ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
 			"message": "id cannot be empty",
 		})
 		return nil
 	}
 
-	personalRecord, err := c.svc.GetRecordByID(id)
+	personalRecord, err := c.svc.GetRecordByID(userId)
 	if err != nil {
 		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "could not get record",
@@ -69,9 +70,44 @@ func (c *PersonalRecordController) UpdateRecord(ctx *fiber.Ctx) error {
 			&fiber.Map{"message": "request failed"})
 		return err
 	}
+	fmt.Println(personalRecord)
 
 	personalRecordNew, err := c.svc.UpdateRecord(personalRecord)
 
+	if err != nil {
+		ctx.Status(http.StatusBadRequest).JSON(
+			&fiber.Map{"message": "could not update personalRecord"})
+		return err
+	}
+
+	ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		"message": "personalRecord update has been successfully",
+		"data":    personalRecordNew,
+	})
+
+	return nil
+}
+
+func (c *PersonalRecordController) PatchRecord(ctx *fiber.Ctx) error {
+	userId := ctx.Params("id")
+	if userId == "" {
+		ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+			"message": "id cannot be empty",
+		})
+		return nil
+	}
+
+	var jsonMap map[string]interface{}
+	err := ctx.BodyParser(&jsonMap)
+	if err != nil {
+		ctx.Status(http.StatusUnprocessableEntity).JSON(
+			&fiber.Map{"message": "request failed"})
+		return err
+	}
+
+	fmt.Println(jsonMap)
+
+	personalRecordNew, err := c.svc.PatchRecord(userId, jsonMap)
 	if err != nil {
 		ctx.Status(http.StatusBadRequest).JSON(
 			&fiber.Map{"message": "could not update personalRecord"})
@@ -158,4 +194,5 @@ func (c *PersonalRecordController) SetupRoutes(app *fiber.App) {
 	api.Get("/records", c.GetRecordIndex)
 	api.Get("/record/:id", c.GetRecordByID)
 	api.Put("/record/:id", c.UpdateRecord)
+	api.Patch("/record/:id", c.PatchRecord)
 }

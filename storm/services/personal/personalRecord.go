@@ -25,7 +25,7 @@ func Hello(ctx *fiber.Ctx) error {
 	return ctx.SendString("storm personal record")
 }
 
-func (s *PersonalRecordServices) GetRecordIndex2() (*[]models.PersonalRecord, error) {
+func (s *PersonalRecordServices) GetRecordIndex() (*[]models.PersonalRecord, error) {
 	personalRecords, err := s.repo.GetIndex()
 	if err != nil {
 		return nil, err
@@ -46,6 +46,17 @@ func (s *PersonalRecordServices) GetRecordByID(id string) (*models.PersonalRecor
 func (s *PersonalRecordServices) UpdateRecord(personalRecord *models.PersonalRecord) (*models.PersonalRecord, error) {
 
 	personalRecordNew, err := s.repo.UpdateRecord(personalRecord)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return personalRecordNew, nil
+}
+
+func (s *PersonalRecordServices) PatchRecord(userId string, jsonData map[string]interface{}) (*models.PersonalRecord, error) {
+
+	personalRecordNew, err := s.repo.PatchRecord(userId, jsonData)
 
 	if err != nil {
 		return nil, err
