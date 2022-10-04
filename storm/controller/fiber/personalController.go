@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"storm/models"
 	"storm/services/personal"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -20,7 +21,15 @@ func NewPersonalRecordController(s *personal.PersonalRecordServices) *PersonalRe
 }
 
 func (c *PersonalRecordController) GetRecordIndex(ctx *fiber.Ctx) error {
-	personalRecords, err := c.svc.GetRecordIndex()
+	page, err := strconv.Atoi(ctx.Query("page"))
+	if err != nil {
+		page = 0
+	}
+	pageSize, err := strconv.Atoi(ctx.Query("page_size"))
+	if err != nil {
+		pageSize = 0
+	}
+	personalRecords, err := c.svc.GetRecordIndex(page, pageSize)
 	if err != nil {
 		ctx.Status(http.StatusBadRequest).JSON(
 			&fiber.Map{"message": "could not get data"})

@@ -17,12 +17,37 @@ type PersonalRecordRepository struct {
 	db *gorm.DB
 }
 
-func (r *PersonalRecordRepository) GetIndex() (*[]models.PersonalRecord, error) {
+func Paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if page == 0 {
+			page = 1
+		}
+
+		switch {
+		case pageSize > 100:
+			pageSize = 100
+		case pageSize <= 0:
+			pageSize = 2
+		}
+
+		offset := (page - 1) * pageSize
+		return db.Offset(offset).Limit(pageSize)
+	}
+}
+
+func (r *PersonalRecordRepository) GetIndex(page, pageSize int) (*[]models.PersonalRecord, error) {
 	personalRecords := &[]models.PersonalRecord{}
 
-	err := r.db.Find(personalRecords).Error
-	if err != nil {
-		return nil, err
+	if (page <= 0) && (pageSize <= 0) {
+		err := r.db.Find(personalRecords).Error
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		err := r.db.Scopes(Paginate(page, pageSize)).Find(personalRecords).Error
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return personalRecords, nil

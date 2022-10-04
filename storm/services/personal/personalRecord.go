@@ -25,8 +25,8 @@ func Hello(ctx *fiber.Ctx) error {
 	return ctx.SendString("storm personal record")
 }
 
-func (s *PersonalRecordServices) GetRecordIndex() (*[]models.PersonalRecord, error) {
-	personalRecords, err := s.repo.GetIndex()
+func (s *PersonalRecordServices) GetRecordIndex(page, pageSize int) (*[]models.PersonalRecord, error) {
+	personalRecords, err := s.repo.GetIndex(page, pageSize)
 	if err != nil {
 		return nil, err
 	}
