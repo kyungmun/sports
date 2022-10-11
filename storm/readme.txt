@@ -50,3 +50,20 @@ SELECT COLUMN_NAME, character_set_name,COLLATION_NAME FROM information_schema.`C
 WHERE table_schema = "storm"
   AND table_name = "xe_member_attend_check"
   AND column_name = "m_name";  
+
+
+* 파일 편집 모니터링하고 있다가 어플 재구동시키는 커맨드
+
+https://github.com/cosmtrek/air
+라이브러리 다운 받고
+프로젝트 위치에서 
+> air 실행하면 됨.
+
+compiledaemon
+https://pkg.go.dev/github.com/githubnemo/compiledaemon#hdr-Examples
+
+go get github.com/githubnemo/CompileDaemon
+으로 라이브러리 다운받고.
+
+프로젝트 위치에서 
+> CompileDaemon -command="./storm"

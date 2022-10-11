@@ -9,6 +9,7 @@ import (
 	"storm/services/personal"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/template/html"
 )
 
 type FiberHendler struct {
@@ -16,7 +17,10 @@ type FiberHendler struct {
 }
 
 func NewFiber() *FiberHendler {
-	app := fiber.New()
+	engine := html.New("./views", ".html")
+	app := fiber.New(fiber.Config{
+		Views: engine,
+	})
 	return &FiberHendler{App: app}
 }
 

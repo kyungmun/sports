@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	controller "storm/controller/fiber"
@@ -9,6 +10,8 @@ import (
 	"storm/services"
 
 	_ "github.com/arsmn/fiber-swagger/v2/example/docs"
+	"github.com/gofiber/fiber/v2"
+
 	"github.com/joho/godotenv"
 )
 
@@ -52,6 +55,20 @@ func main() {
 	fiberCtrl := controller.NewFiber()
 
 	fiberCtrl.SetupRoutes(service)
+
+	//middleware test
+	fiberCtrl.App.Use(func(c *fiber.Ctx) error {
+		fmt.Println("fiber middleware")
+		return c.Next()
+	})
+
+	// Render index template
+	fiberCtrl.App.Get("/", func(c *fiber.Ctx) error {
+		return c.Render("index", fiber.Map{
+			"Title": "Sports Score Management System!",
+			"Name":  "Kyungmun, lim",
+		})
+	})
 
 	fiberCtrl.Listen(":8081")
 
