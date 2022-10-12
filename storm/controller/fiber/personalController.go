@@ -37,7 +37,7 @@ func (c *PersonalRecordController) GetRecordIndex(ctx *fiber.Ctx) error {
 	}
 
 	ctx.Status(http.StatusOK).JSON(&fiber.Map{
-		"message": "8081 records all get successfully",
+		"message": "fiber engine, records all get successfully",
 		"count":   len(*personalRecords),
 		"data":    personalRecords,
 	})

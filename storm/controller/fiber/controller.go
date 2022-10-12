@@ -42,8 +42,8 @@ func (f *FiberHendler) SetupRoutes(svc *services.ServiceRepository) {
 		log.Fatal("could not personal services create")
 	}
 
-	personalCtrl := NewPersonalRecordController(personalService)
-	personalCtrl.SetupRoutes(f.App)
+	personalController := NewPersonalRecordController(personalService)
+	personalController.SetupRoutes(f.App)
 
 	//팀기록
 

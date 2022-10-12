@@ -4,42 +4,44 @@ package controller
 
 import (
 	"log"
+	"storm/repository"
 	"storm/services"
+	"storm/services/personal"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gin-gonic/gin"
 )
 
-type FiberHendler struct {
-	App *fiber.App
+type GinHendler struct {
+	App *gin.Engine
 }
 
-func NewFiber() *FiberHendler {
-	app := fiber.New()
-	return &FiberHendler{App: app}
+func NewGin() *GinHendler {
+	app := gin.New()
+	return &GinHendler{App: app}
 }
 
-func (f *FiberHendler) Listen(port string) {
-	err := f.App.Listen(port)
+func (f *GinHendler) Listen(port string) {
+	err := f.App.Run(port)
 	if err != nil {
 		log.Panic("service start fail")
 	}
 }
 
-func (f *FiberHendler) SetupRoutes(svc *services.ServiceRepository) {
+func (f *GinHendler) SetupRoutes(svc *services.ServiceRepository) {
 	//개인기록
-	/*
-		personalRepo, err := repository.NewPersonalRecordRepository(svc.DB)
-		if err != nil {
-			log.Fatal("could not personal repository create")
-		}
-		personalService, err := personal.NewPersonalRecordServices(personalRepo)
-		if err != nil {
-			log.Fatal("could not personal services create")
-		}
 
-		personalCtrl := NewPersonalRecordController(personalService)
-		personalCtrl.SetupRoutes(f.App)
-	*/
+	personalRepo, err := repository.NewPersonalRecordRepository(svc.DB)
+	if err != nil {
+		log.Fatal("could not personal repository create")
+	}
+	personalService, err := personal.NewPersonalRecordServices(personalRepo)
+	if err != nil {
+		log.Fatal("could not personal services create")
+	}
+
+	personalController := NewPersonalRecordController(personalService)
+	personalController.SetupRoutes(f.App)
+
 	//팀기록
 
 }

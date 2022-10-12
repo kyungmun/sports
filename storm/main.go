@@ -1,16 +1,14 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
-	controller "storm/controller/fiber"
+	controllerGin "storm/controller/gin"
 	"storm/models"
 	"storm/repository"
 	"storm/services"
 
 	_ "github.com/arsmn/fiber-swagger/v2/example/docs"
-	"github.com/gofiber/fiber/v2"
 
 	"github.com/joho/godotenv"
 )
@@ -52,43 +50,32 @@ func main() {
 
 	service := services.New(db)
 
-	fiberCtrl := controller.NewFiber()
-
-	fiberCtrl.SetupRoutes(service)
-
-	//middleware test
-	fiberCtrl.App.Use(func(c *fiber.Ctx) error {
-		fmt.Println("fiber middleware")
-		return c.Next()
-	})
-
-	// Render index template
-	fiberCtrl.App.Get("/", func(c *fiber.Ctx) error {
-		return c.Render("index", fiber.Map{
-			"Title": "Sports Score Management System!",
-			"Name":  "Kyungmun, lim",
-		})
-	})
-
-	fiberCtrl.Listen(":8081")
-
-	//service.SetupRoutes(fiberCtrl.App)
-
 	/*
-			//fiberController.App.Get("/swagger/*", swagger.HandlerDefault) // default
-			//app := fiber.New()
-		  //app.Get("/swagger/*", swagger.HandlerDefault) // default
+		//fiber engine
+		fiberCtrl := controllerFiber.NewFiber()
+		fiberCtrl.SetupRoutes(service)
 
-			service := &services.Repository{
-				DB: db,
-			}
+		//middleware test
+		fiberCtrl.App.Use(func(c *fiber.Ctx) error {
+			fmt.Println("fiber middleware")
+			return c.Next()
+		})
 
-			// app.Use(cors.New(cors.Config{
-			// 	AllowMethods: "GET,POST,HEAD,PUT,DELETE,PATCH",
-			// }))
+		// Render index template
+		fiberCtrl.App.Get("/", func(c *fiber.Ctx) error {
+			return c.Render("index", fiber.Map{
+				"Title": "Sports Score Management System!",
+				"Name":  "Kyungmun, lim",
+			})
+		})
 
-			service.SetupRoutes(app)
-
-			app.Listen(":8080")
+		fiberCtrl.Listen(":8081")
 	*/
+
+	//gin engine
+	ginCtrl := controllerGin.NewGin()
+
+	ginCtrl.SetupRoutes(service)
+
+	ginCtrl.Listen(":8081")
 }
