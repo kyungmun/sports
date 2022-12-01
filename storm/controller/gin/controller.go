@@ -40,6 +40,7 @@ func (f *GinHendler) SetupRoutes(svc *services.ServiceRepository) {
 	}
 
 	personalController := NewPersonalRecordController(personalService)
+	
 	personalController.SetupRoutes(f.App)
 
 	//팀기록
